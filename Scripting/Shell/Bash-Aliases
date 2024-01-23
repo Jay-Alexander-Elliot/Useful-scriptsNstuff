@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Check and append aliases to .bashrc if they don't exist
+if grep -q "helloworld-alias" ~/.bashrc; then
+    echo "Aliases already exist"
+else
+    cat <<EOT >> ~/.bashrc
+# Custom aliases - helloworld-alias
+alias tag='echo "Hello, World!"'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias c='clear'
+alias py='python3'
+alias kl='kubectl'
+alias myip="hostname -I | awk '{print \$1}'"
+EOT
+    echo "Aliases copied to ~/.bashrc ('ls -alf=ll' | 'clear=c' | 'python3=py' | 'kubectl=kl' | 'myip')"
+    source ~/.bashrc
+fi
+
+# Enhanced scp command with user prompts for increased usability
+read -p "Enter the path to your private key (e.g., /path/to/key.pem): " key_path
+read -p "Enter the username: " username
+read -p "Enter the machine IP: " machine_ip
+read -p "Enter the destination path on the remote machine: " remote_path
+scp -i "$key_path" alias.sh "$username@$machine_ip:$remote_path"
