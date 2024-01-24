@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Title: Terraform Installer
-# Description: This script automates the installation of Terraform on Linux distributions. It detects the distribution type and installs Terraform using the appropriate package manager and repository.
+# Title: Vagrant Installer
+# Description: This script automates the installation of Vagrant by HashiCorp on Linux distributions. It detects the distribution type and installs Vagrant using the appropriate package manager and repository.
 # Author: Jay-Alexander Elliot
 # Date: 2024-01-23
-# Usage: Run this script with root privileges. Usage: sudo ./terraform_installer.sh
+# Usage: Run this script with root privileges. Usage: sudo ./vagrant_installer.sh
 
 UB() {
     # Update system packages and install dependencies
@@ -22,8 +22,8 @@ UB() {
         https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
         sudo tee /etc/apt/sources.list.d/hashicorp.list
     
-    # Update package lists and install Terraform
-    sudo apt update && sudo apt-get install terraform -y
+    # Update package lists and install Vagrant
+    sudo apt update && sudo apt-get install vagrant -y
 }
 
 RH() {
@@ -33,11 +33,11 @@ RH() {
     # Add the official HashiCorp Linux repository
     sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
 
-    # Install Terraform
-    sudo yum -y install terraform
+    # Install Vagrant
+    sudo yum -y install vagrant
 
     # Verify the installation
-    terraform -help
+    vagrant --version
 }
 
 # Check the Linux distribution and call the appropriate function

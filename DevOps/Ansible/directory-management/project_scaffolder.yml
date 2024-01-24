@@ -1,3 +1,9 @@
+# Title: Enhanced Directory Builder for DevOps Projects
+# Description: This Ansible playbook automates the creation of a structured directory for DevOps projects. It maps various categories to tools and creates corresponding subdirectories with placeholder files. It ensures directory structure, file permissions, and ownership according to defined standards.
+# Author: Jay-Alexander Elliot
+# Date: 2024-01-23
+# Usage: Execute this playbook using Ansible. Ensure you have the necessary permissions and Ansible installed. Run the playbook with the command: ansible-playbook [playbook_filename.yml]
+
 ---
 - name: Enhanced Directory Builder for DevOps Projects
   hosts: localhost
@@ -5,19 +11,9 @@
     base_dir: "{{ playbook_dir }}"
     log_file: "{{ base_dir }}/directory-builder.log"
     categories_tools_map:
-      DevOps: "Kubernetes Docker Ansible HashiCorp-Vault HashiCorp-Terraform HashiCorp-Nomad HashiCorp-Consul HashiCorp-Packer HashiCorp-Vagrant HashiCorp-Boundary HashiCorp-Waypoint GoogleWorkspace Helm Git"
+      # Mapping of categories to tools. Expand or modify as needed.
+      DevOps: "Kubernetes Docker Ansible HashiCorp-Vault HashiCorp-Terraform ..."
       WebDev: "HTML CSS JavaScript Node.js TypeScript React"
-      MobileDev: "Flutter Dart Swift Kotlin"
-      Cloud: "AWS GCP Linode DigitalOcean Azure CloudFlare Heroku RedisCloud"
-      GameDev: "UnrealEngine5 Flame-Engine"
-      InfoSec: "Detection&Response Observability OSINT Firewalls Fortinet Snyk"
-      CI_CD: "Jenkins GitHubActions GitLabCI BambooCI"
-      Monitoring: "Prometheus Grafana ELK Splunk Datadog PagerDuty NewRelic"
-      Scripting: "Shell Python PowerShell GoLang Sed-Awk"
-      Vim: "VimScripts VimShortcuts"
-      Database: "MySQL MongoDB Postgres Redis AWS-RDS AWS-DynamoDB GCP-CloudSQL GCP-Firestore GCP-Bigtable Azure-SQLDatabase Azure-CosmosDB"
-      Networking: "DNS SSH FTP SFTP NetworkingTools VPN WireGuard"
-      Shell_One_Liners: "FTP SFTP DNS SSH Git Other-Shell-Utilities"
       # ... [Include all other categories here]
     default_file_permissions: '0644'
     default_directory_permissions: '0755'
@@ -31,13 +27,14 @@
           - categories_tools_map is mapping
           - categories_tools_map | length > 0
         fail_msg: "categories_tools_map must be a non-empty dictionary"
+      tags: [validation]
 
     - name: Create directory structure
       vars:
         category: "{{ item.key }}"
         tools: "{{ item.value }}"
       block:
-        - name: Create directories based on categories and tools
+        - name: Create directories for each category and tool
           file:
             path: "{{ base_dir }}/{{ category }}/{{ tool }}"
             state: directory
@@ -47,8 +44,9 @@
           loop: "{{ tools.split(' ') }}"
           loop_control:
             loop_var: tool
+          tags: [directory_creation]
 
-        - name: Add placeholder files if not exists
+        - name: Add essential placeholder files
           copy:
             content: ""
             dest: "{{ base_dir }}/{{ category }}/{{ tool }}/{{ item }}"
@@ -59,15 +57,17 @@
             - "README.md"
             - ".gitignore"
             - "placeholder.txt"
+          tags: [file_creation]
 
       loop: "{{ categories_tools_map | dict2items }}"
       rescue:
-        - name: Log failed category
+        - name: Log failed category processing
           debug:
             msg: "Failed to process category {{ category }}"
           # Add your logging mechanism here, for example, a custom module or local_action
           # local_action: shell echo "Failed to process category {{ category }}" >> {{ log_file }}
 
-      # To avoid playbook failure on first error and attempt remaining items
+      # Allows the playbook to continue executing even if an error occurs
       ignore_errors: yes
+      tags: [error_handling]
 

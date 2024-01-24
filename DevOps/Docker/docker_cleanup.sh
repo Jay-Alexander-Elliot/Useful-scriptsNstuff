@@ -1,36 +1,47 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Title: Docker Cleanup Utility
+# Description: This script provides a set of functions to manage Docker images and containers. It allows the removal of <none> tagged images, <none> named containers, last created images, all exited containers, and specific images or containers by ID.
+# Author: Jay-Alexander Elliot
+# Date: 2024-01-23
+# Usage: ./docker_cleanup_utility.sh [OPTION] [ARGUMENTS...]
+# Options:
+#   -l, --last      Remove the last image created.
+#   -e, --exited    Remove all exited containers.
+#   -i, --image     Remove specific image/s by ID. IDs should be passed as additional arguments.
+#   -c, --container Remove specific container/s by ID. IDs should be passed as additional arguments.
+#   -h, --help      Display this help and exit.
 
 # Function to remove none tagged images
 remove_none_images() {
-    images=$(docker images | grep '^<none>' | awk '{print $3}')
+    images=$(docker images | grep '<none>' | awk '{print $3}')
     if [ -n "$images" ]; then
         docker rmi -f $images
     else 
-        echo "No none images"
+        echo "No none-tagged images to remove."
     fi
 }
 
 # Function to remove none named containers
 remove_none_containers() {
-    conts=$(docker ps -a | grep '^<none>' | awk '{print $1}')
+    conts=$(docker ps -a | grep '<none>' | awk '{print $1}')
     if [ -n "$conts" ]; then
         docker rm -f $conts
     else
-        echo "No none containers"
+        echo "No none-named containers to remove."
     fi
 }
 
 # Function to display help
 display_help() {
     echo
-    echo "Removes none images and none containers"
-    echo "Usage: clean_none.sh [OPTION]"
+    echo "Removes <none> tagged images and <none> named containers among other utilities."
+    echo "Usage: ./docker_cleanup_utility.sh [OPTION] [ARGUMENTS...]"
     echo
-    echo "  -l, --last      remove last image created"
-    echo "  -e, --exited    remove all exited containers"
-    echo "  -i, --image     remove specific image/s by id"
-    echo "  -c, --container remove specific container/s by id"
-    echo "  -h, --help      display this help and exit"
+    echo "  -l, --last      Remove the last image created."
+    echo "  -e, --exited    Remove all exited containers."
+    echo "  -i, --image     Remove specific image/s by ID. IDs should be passed as additional arguments."
+    echo "  -c, --container Remove specific container/s by ID. IDs should be passed as additional arguments."
+    echo "  -h, --help      Display this help and exit."
 }
 
 # Function to remove the last image created
@@ -39,7 +50,7 @@ remove_last_image() {
     if [ -n "$last" ]; then
         docker rmi -f "$last"
     else
-        echo "No images to delete"
+        echo "No images to delete."
     fi
 }
 

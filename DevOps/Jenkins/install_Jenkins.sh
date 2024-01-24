@@ -1,5 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Title: Jenkins Installer
+# Description: This script automates the installation or reinstallation of Jenkins and its dependencies (Java, Maven, Git, Curl) on Debian-based systems. It checks if Jenkins is already installed and prompts the user for uninstallation before proceeding with a fresh installation.
+# Author: Jay-Alexander Elliot
+# Date: 2024-01-23
+# Usage: Run this script with root privileges. Usage: sudo ./jenkins_installer.sh
 
+# Function to prompt the user before uninstalling Jenkins
 ask_before_uninstall() {
     read -p "Do you want to uninstall Jenkins? (y/n) " check_ans
     case "$check_ans" in
@@ -24,12 +30,14 @@ ask_before_uninstall() {
     esac
 }
 
+# Function to install Jenkins and its dependencies
 install_jenkins() {
-    # Install Java
+    # Update the package list
+    sudo apt update
+
+    # Install Java and set JAVA_HOME
     sudo apt install -y openjdk-11-jdk
-    # Set JAVA_HOME for Jenkins
     echo 'JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"' | sudo tee /etc/profile.d/jdk.sh
-    # Reload environment variables
     source /etc/profile.d/jdk.sh
     clear
     java -version
@@ -63,14 +71,9 @@ install_jenkins() {
     echo
     sleep 1
 
-    clear 
-    echo "Jenkins Dependencies are installed"
-    echo
+    # Install Jenkins
     echo "Installing Jenkins"
     echo
-    sleep 2
-
-    # Installing Jenkins
     wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee /usr/share/keyrings/jenkins-archive-keyring.gpg >/dev/null
     echo deb [signed-by=/usr/share/keyrings/jenkins-archive-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list >/dev/null
     sudo apt update
@@ -79,7 +82,6 @@ install_jenkins() {
     sudo systemctl start jenkins
 
     clear 
-
     echo "Jenkins is now up & running :)"
     echo 
     echo "You can check its state with the following command:"
@@ -89,7 +91,7 @@ install_jenkins() {
     echo "http://<ip>:8080/ or http://localhost:8080/"
 }
 
-# Check if Jenkins is installed
+# Check if Jenkins is installed and decide the action based on it
 check_jenkins() {
     if [ -x "$(command -v jenkins)" ]; then
         echo "Jenkins is already installed"
@@ -99,4 +101,6 @@ check_jenkins() {
         install_jenkins
     fi
 }
+
+# Start the script by checking if Jenkins is installed
 check_jenkins

@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-# Script Name: SystemMetricsCollector.sh
+# Title: SystemMetricsCollector.sh
+# Description: This script collects and displays system metrics including load, memory, and storage. It offers an interactive way for users to specify what metrics they want to retrieve.
+# Author: Jay-Alexander Elliot
+# Date: 2024-01-23
+# Usage: Execute this script with one of the following arguments: load, memory, or storage. 
+#        For example, 'sudo ./SystemMetricsCollector.sh load' to get system load metrics.
 
 # Validate if user is root
 if [[ $(id -u) -ne 0 ]]; then
@@ -7,7 +12,8 @@ if [[ $(id -u) -ne 0 ]]; then
   exit 1
 fi
 
-# Get system load metrics
+# Function to get system load metrics.
+# User inputs time span (1, 5, or 15 minutes), and the script returns the average system load for that duration.
 get_load() {
   read -p "Enter time span of system load (1,5,15): " time_span
   case $time_span in
@@ -22,7 +28,8 @@ get_load() {
   esac
 }
 
-# Get system memory metrics
+# Function to get system memory metrics.
+# User inputs memory category (total, used, or free), and the script returns the corresponding memory metric in MB.
 get_memory() {
   read -p "Enter category of system memory (total,used,free): " category
   case $category in
@@ -42,7 +49,8 @@ get_memory() {
   esac
 }
 
-# Get system storage metrics
+# Function to get system storage metrics.
+# User inputs storage category (total, used, or free), and the script returns the corresponding storage metric in GB.
 get_storage() {
   read -p "Enter category of system storage (total,used,free): " category
   case $category in
@@ -62,7 +70,8 @@ get_storage() {
   esac
 }
 
-# Main execution
+# Main execution block
+# Validates the input argument and calls the corresponding function to display the requested system metrics.
 case $1 in
   load)
     get_load
@@ -75,6 +84,7 @@ case $1 in
     ;;
   *)
     echo "Usage: $0 {load|memory|storage}"
+    echo "Example: $0 load"
     exit 1
     ;;
 esac
